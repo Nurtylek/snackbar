@@ -1,25 +1,37 @@
-import logo from './logo.svg';
 import './App.css';
+import React, {useState, useMemo, useContext, useEffect} from 'react';
+import {SnackBarContext} from "./snackbar";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+    useEffect(() => {
+
+        if (isSnackbarOpen) {
+            setTimeout(() => {
+                setIsSnackbarOpen(false)
+            }, 3000)
+        }
+
+    }, [isSnackbarOpen, setIsSnackbarOpen])
+
+    const memoizedValue = useMemo(() => ({isSnackbarOpen, setIsSnackbarOpen}), [isSnackbarOpen, setIsSnackbarOpen]);
+
+    return (
+        <SnackBarContext.Provider value={memoizedValue}>
+            <Test />
+
+            { isSnackbarOpen && <div>Snackbar alert</div> }
+        </SnackBarContext.Provider>
+    );
 }
 
 export default App;
+
+const Test = () => {
+    const snackbarContext = useContext(SnackBarContext)
+
+    return <React.Fragment>
+        <button onClick={() => snackbarContext.setIsSnackbarOpen(true)}>Open Snackbar</button>
+    </React.Fragment>
+}
